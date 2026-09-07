@@ -1,0 +1,130 @@
+---
+title: "Heart Failure Clinical Records"
+Subtitle: "Data 607: Assignment 1"
+Date: "September 2026"
+author: "Yalda Azamee"
+format: html
+editor: visual
+---
+
+## Heart Failure Clinical Records
+
+## Introduction
+
+This assignment uses the Heart Failure Clinical Records dataset from the UCI Machine Learning Repository, which contains medical records for 299 patients with heart failure collected during their follow-up period. The associated study by Chicco and Jurman (2020) investigated whether clinical characteristics could be used to predict patient survival and found that serum creatinine and ejection fraction were particularly important predictors. The goal of this assignment is to load the dataset into R, select meaningful variables, and transform the data into a clear and usable data frame for further analysis.
+
+## Approach
+
+In this assignment, I selected a dataset from UCI Machine Learning Repository. The research looked at patients who already had **heart failure** and investigated whether clinical characteristics could help predict **survival/death during the follow-up period.** The dataset contains 12 features and 299 patients. The variables include age, diabetes, blood pressure, ejection fraction, serum creatinine, smoking, follow-up time, and death event. I chose this dataset because it includes a clear outcome variable, death event which indicates whether a patient died during the follow-up period and can be used for future analysis.
+
+I loaded the data into R and selected a smaller set of meaningful variables that provide useful information about the patients and their outcomes.
+
+To make the data easier to understand, I renamed variables that were not immediately intuitive and converted binary variables coded as 0 and 1 into descriptive labels such as ‘Yes’ and ‘No.’ I also included the death_event variable as the target variable. Finally, I checked the resulting data frame to make sure the selected variables had appropriate names, values, and data types.
+
+## Data Source
+
+<https://archive.ics.uci.edu/dataset/519/heart+failure+clinical+records>
+
+## Research Article
+
+Chicco, D., & Jurman, G. (2020). *Machine learning can predict survival of patients with heart failure from serum creatinine and ejection fraction alone.*
+
+[Research Article](https://doi.org/10.1186/s12911-020-1023-5)
+
+## Research Question
+
+Among people who already have heart failure, can information about their health and clinical measurements help us understand or predict who is more likely to survive?
+
+
+## Load Required Packages
+
+I loaded the tidyverse package to access functions for importing, exploring, and transforming the data.
+
+```{r}
+library(tidyverse)
+```
+
+## Importing the Data
+
+The dataset is imported directly from the UCI Machine Learning Repository using an online URL. Loading the data directly from an online source makes the analysis more reproducible because another user can run the code without needing the original file stored on my computer.
+
+## Importing the data using read_csv code 
+
+```{r importing-the-data}
+heart_failure <- read_csv(
+  "https://archive.ics.uci.edu/ml/machine-learning-databases/00519/heart_failure_clinical_records_dataset.csv"
+)
+```
+## Explore the Original Data
+
+Before transforming the data, I examined the dataset to understand its structure and contents.
+
+```{r}
+head(heart_failure)
+
+dim(heart_failure)
+
+names(heart_failure)
+
+glimpse(heart_failure)
+
+summary(heart_failure)
+```
+```{r}
+heart_failure_final <- heart_failure %>%
+  select(
+    age,
+    sex,
+    diabetes,
+    high_blood_pressure,
+    ejection_fraction,
+    serum_creatinine,
+    smoking,
+    time,
+    DEATH_EVENT
+  )
+```
+
+
+## Data Transformation
+
+The original dataset contains several demographic, clinical, and follow-up variables. For this assignment, I selected a smaller group of variables that are relevant to the research question and include the death_event target variable. I also renamed selected variables to make their meanings clearer and converted several binary variables from numeric codes into descriptive labels such as "Yes," "No," "Died," and "Survived."
+
+```{r}
+heart_failure_final <- heart_failure_final %>%
+  rename(
+    hypertension = high_blood_pressure,
+    ejection_fraction_percent = ejection_fraction,
+    follow_up_days = time,
+    death_event = DEATH_EVENT
+  ) %>%
+  mutate(
+    diabetes = if_else(diabetes == 1, "Yes", "No"),
+    hypertension = if_else(hypertension == 1, "Yes", "No"),
+    smoking = if_else(smoking == 1, "Yes", "No"),
+    death_event = if_else(death_event == 1, "Died", "Survived")
+  )
+```
+
+
+## Final Data Frame
+
+The final data frame contains 299 patient records and 9 selected variables.
+
+```{r}
+dim(heart_failure_final)
+names(heart_failure_final)
+head(heart_failure_final)
+```
+
+## Findings and Recommendations
+
+The data preparation process produced a smaller and more readable data frame containing demographic information, clinical measurements, follow-up time, and the patient survival outcome. The selected variables include serum creatinine and ejection fraction, which are particularly important in the research article by Chicco and Jurman. The transformation also makes several binary variables easier to interpret by replacing numeric codes with descriptive labels.
+
+The next step would be to examine the relationships between the selected clinical variables and the death_event outcome. In particular, I would explore whether serum creatinine and ejection fraction show different patterns between patients who survived and those who died during the follow-up period.
+
+To extend the work from the original article, I could compare the results using additional variables from the original dataset and determine whether serum creatinine and ejection fraction remain the strongest predictors. I could also create visualizations and statistical analyses to further examine these relationships. A predictive model could be developed in a future assignment to evaluate how accurately the selected variables predict survival.
+
+## AI Use
+
+I used ChatGPT (OpenAI) as a learning and coding support tool during this assignment. I used it to help me understand the assignment requirements, learn and interpret R and tidyverse code, troubleshoot coding errors, improve the organization and wording of my QMD document, and clarify concepts that I found difficult. I also used it to review my code and explain errors when my code did not work as expected.
