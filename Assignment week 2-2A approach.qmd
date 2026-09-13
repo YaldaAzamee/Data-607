@@ -1,0 +1,51 @@
+
+---
+title: "SQL and R – Movie Ratings"
+author: "Yalda Azamee"
+date: "09/12/2026"
+format: html
+---
+### Approach: SQL and R – Movie Ratings
+
+### Introduction
+
+For this assignment, I plan to collect movie-rating data from at least five participants and use the data to create a small relational database. I will select six recent popular movies and ask participants to rate the movies they have seen on a scale from 1 to 5. I will then store the data in a SQL database and use R to load, inspect, clean, and analyze the ratings.
+
+### Data Collection
+
+I will select six recent and popular movies that are familiar enough that participants are likely to have seen at least some of them. I will ask at least five participants to rate each movie they have seen using a 1–5 rating scale. I will record a missing rating when a participant has not seen a particular movie rather than asking them to assign a rating to a movie they have not watched.
+
+To protect participants' privacy and keep the project appropriate for a public GitHub repository, I plan to identify participants using anonymous IDs rather than including personally identifying information.
+
+### SQL Database Design
+
+I plan to use a relational database with three tables: `users`, `movies`, and `ratings`. The `users` table will contain a unique identifier for each participant, while the `movies` table will contain a unique identifier and title for each movie. The `ratings` table will connect participants and movies and store the rating provided by each participant.
+
+This structure will allow me to demonstrate the use of primary keys and foreign keys and the many-to-many relationship between users and movies. I will create and populate the tables using SQL code and use SQL `JOIN` statements to combine the tables when retrieving the data for analysis.
+
+### Loading and Analyzing the Data in R
+
+After creating and populating the SQL database, I will load the ratings data into R as a dataframe. I will use R and packages such as `DBI` and `dplyr` to inspect and transform the data.
+
+My initial analysis will focus on:
+-   the number of ratings received by each movie;
+-   the average rating for each movie;
+-   identifying missing ratings;
+-   comparing the movies based on their average ratings.
+I also plan to create a simple visualization to make the movie-rating results easier to compare.
+
+### Missing Data
+
+One of the main data challenges I anticipate is missing ratings because participants may not have seen all six movies. I will treat an unanswered rating as missing data rather than interpreting it as a rating of zero.
+
+When calculating average ratings, I will exclude missing values so that the average reflects only participants who actually rated the movie. I will also report the number of available ratings for each movie so that an average based on a small number of responses is not presented without context.
+
+### Anticipated Challenges
+
+I anticipate several potential data challenges. First, participants may have seen different combinations of the six movies, resulting in an uneven number of ratings across movies. Second, I will need to make sure that ratings are restricted to the valid 1–5 scale. Third, I will need to maintain consistent identifiers between the SQL tables so that the tables can be joined correctly.
+
+I will also check the data for duplicate ratings, invalid values, and missing information before performing the analysis.
+
+### Expected Outcome
+
+The final result will be a small but structured movie-rating dataset that demonstrates the process of collecting data, storing it in a relational SQL database, retrieving it into R, handling missing data, and performing basic analysis. The project will also provide an opportunity to practice SQL joins, relational database design, data cleaning, and visualization in R.
