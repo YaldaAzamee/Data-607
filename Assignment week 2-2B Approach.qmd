@@ -1,0 +1,22 @@
+---
+title: "Classification Metrics"
+author: "Yalda Azamee"
+Date: "09/13/2026"
+format: html
+---
+
+## Approach
+
+I will begin by exploring the `penguin_predictions.csv` dataset to understand the structure of the data and the distribution of the actual `sex` classes. I will first determine whether the classes are balanced and calculate the null error rate based on the majority class. This will provide a baseline for evaluating whether the classification model is performing better than a simple majority-class prediction.
+
+Next, I will focus on the `.pred_female` variable, which contains the model's predicted probability for the female class. Rather than relying on the existing `.pred_class` variable, I will use the predicted probabilities to generate class predictions at three different thresholds: 0.2, 0.5, and 0.8. This will allow me to examine how changing the threshold affects the number and type of classification errors.
+
+For each threshold, I will compare the predicted class with the actual `sex` value and organize the results into a confusion matrix containing true positives, false positives, true negatives, and false negatives. I will then use these values to calculate accuracy, precision, recall, and F1 score and compare the results across the three thresholds.
+
+One challenge I anticipate is making sure that the definition of the positive class is consistent throughout the analysis. Since the assignment focuses on predicting the female class, I will treat female as the positive class and make sure that the interpretation of TP, FP, TN, and FN follows this definition. I will also pay attention to the difference between predicted probabilities and predicted class labels so that changing the threshold produces the intended predictions.
+
+Finally, I will use the results to explain the tradeoff between lower and higher probability thresholds. In particular, I will consider how a lower threshold may identify more positive cases while also producing more false positives, whereas a higher threshold may reduce false positives but increase false negatives. I will connect these tradeoffs to real-world situations where the consequences of different types of classification errors may influence the choice of threshold.
+
+I will use R and `ggplot2` for the analysis and visualization and structure the work so that the analysis is reproducible and can be tested using the provided data source.
+
+For Data source; I will use the penguin_predictions.csv dataset provided through the course GitHub repository. The dataset contains model-predicted probabilities, predicted class labels, and the actual class labels.
