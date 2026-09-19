@@ -1,0 +1,272 @@
+---
+title: "SQL and R – Movie Ratings"
+author: "Yalda Azamee"
+date: "09/12/2026"
+format: html
+---
+
+## Approach: SQL and R – Movie Ratings
+
+### Introduction
+
+For this project, I collected ratings from 10 participants, who are my friends for six selected movies. Participants rated each movie they had seen on a scale from 1 to 5. The collected ratings were stored in a PostgreSQL relational database and loaded into R for data cleaning, exploration, and summary analysis.
+
+The six movies selected for this project are *The Wolf of Wall Street*, *The Godfather*, *Spider-Man*, *Home Alone*, *Titanic*, and *Harry Potter*.
+
+## Research Question
+
+What are the average ratings given by participants for each of the six selected movies?
+
+## 1. Load Required R Packages
+
+```{r}
+library(tidyverse)
+library(DBI)
+library(RPostgres)
+```
+
+```{r}
+con <- dbConnect(
+  RPostgres::Postgres(),
+  dbname = "movie_ratings",
+  host = "localhost",
+  port = 5433,
+  user = "postgres",
+  password = Sys.getenv("PGPASSWORD")
+)
+```
+
+
+```{r}
+dbListTables(con)
+```
+
+## 2. Load Data from PostgreSQL
+
+```{r}
+ratings_data <- dbGetQuery(
+  con,
+  "SELECT * FROM ratings"
+)
+
+movies_data <- dbGetQuery(
+  con,
+  "SELECT * FROM movies"
+)
+
+users_data <- dbGetQuery(
+  con,
+  "SELECT * FROM users"
+)
+
+```
+
+```{r}
+ratings_data
+```
+
+```{r}
+movies_data
+```
+
+```{r}
+users_data
+```
+
+
+
+
+## 3. Combine Ratings with Movie Information
+
+```{r}
+ratings_full <- ratings_data %>%
+  left_join(movies_data, by = "movie_id")
+
+head(ratings_full)
+
+```
+
+## 4. Check the Data
+
+```{r}
+str(ratings_full)
+```
+```{r}
+summary(ratings_full)
+
+```
+
+```{r}
+n_distinct(ratings_full$user_id)
+```
+
+```{r}
+n_distinct(ratings_full$movie_id)
+```
+
+
+```{r}
+sort(unique(ratings_full$rating))
+```
+
+```{r}
+ratings_full %>%
+  filter(rating < 1| rating > 5)
+```
+
+## 5. Handling Missing Ratings
+
+```{r}
+ratings_full %>%
+  count(title, name="number_of_ratings")
+```
+
+Missing ratings were excluded from the calculation of the average rating.
+
+```{r}
+movie_summary <- ratings_full %>%
+  group_by(title) %>%
+  summarise(
+    number_of_ratings = n(),
+    average_rating = mean(rating, na.rm = TRUE)
+  )
+```
+
+```{r}
+movie_summary
+```
+
+
+```{r}
+ggplot(movie_summary, aes(x = reorder(title, average_rating),
+                          y = average_rating)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Average Ratings by Movies",
+    x = "Movies",
+    y = "Average Rating"
+  )
+```
+## 6. SQL Database Creation and Population
+
+The movie-rating data were stored in a PostgreSQL database using three related tables: users, movies, and ratings. The ratings table connects users and movies and contains ratings from 1 to 5.
+
+### 6.1 Users Table
+
+The users table stores the IDs of the participants.
+
+```sql
+CREATE TABLE users (
+    user_id VARCHAR(10) PRIMARY KEY
+);
+
+INSERT INTO users (user_id)
+VALUES
+('U01'),
+('U02'),
+('U03'),
+('U04'),
+('U05'),
+('U06'),
+('U07'),
+('U08'),
+('U09'),
+('U10');
+```
+
+### 6.2 Movies Table
+
+The movies table stores the movie IDs and movie titles.
+
+```sql
+CREATE TABLE movies (
+    movie_id VARCHAR(10) PRIMARY KEY,
+    title VARCHAR(100) NOT NULL
+);
+
+INSERT INTO movies (movie_id, title)
+VALUES
+('M01', 'The Wolf of Wall Street'),
+('M02', 'The Godfather'),
+('M03', 'Spider-Man'),
+('M04', 'Home Alone'),
+('M05', 'Titanic'),
+('M06', 'Harry Potter');
+```
+
+### 6.3 Ratings Table
+
+The ratings table stores the rating given by each participant for each movie.
+
+```sql
+CREATE TABLE ratings (
+    user_id VARCHAR(10),
+    movie_id VARCHAR(10),
+    rating INTEGER CHECK (rating BETWEEN 1 AND 5),
+    PRIMARY KEY (user_id, movie_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (movie_id) REFERENCES movies(movie_id)
+);
+
+INSERT INTO ratings (user_id, movie_id, rating)
+VALUES
+('U01', 'M01', 2),
+('U01', 'M02', 5),
+('U01', 'M03', 3),
+('U01', 'M04', 3),
+('U01', 'M05', 4),
+('U01', 'M06', 2),
+('U02', 'M01', 5),
+('U02', 'M02', 5),
+('U02', 'M03', 5),
+('U02', 'M05', 4),
+('U02', 'M06', 4),
+('U03', 'M01', 5),
+('U03', 'M02', 5),
+('U03', 'M03', 4),
+('U03', 'M04', 5),
+('U03', 'M05', 5),
+('U03', 'M06', 5),
+('U04', 'M03', 5),
+('U04', 'M04', 3),
+('U04', 'M05', 5),
+('U04', 'M06', 5),
+('U06', 'M01', 4),
+('U06', 'M03', 3),
+('U06', 'M04', 5),
+('U06', 'M05', 3),
+('U07', 'M01', 5),
+('U07', 'M02', 4),
+('U07', 'M03', 4),
+('U07', 'M04', 5),
+('U07', 'M05', 5),
+('U07', 'M06', 3),
+('U08', 'M02', 5),
+('U08', 'M03', 4),
+('U08', 'M05', 4),
+('U09', 'M01', 4),
+('U09', 'M02', 4),
+('U09', 'M03', 4),
+('U09', 'M04', 4),
+('U09', 'M05', 4),
+('U09', 'M06', 4),
+('U10', 'M01', 4),
+('U10', 'M02', 5),
+('U10', 'M03', 3),
+('U10', 'M04', 3),
+('U10', 'M05', 5),
+('U10', 'M06', 3);
+```
+
+## 7. Results and Interpretation
+
+The analysis shows differences in the average ratings given to the six movies. The Godfather received the highest average rating of 4.71 based on 7 ratings. Titanic had the second-highest average rating of 4.33 based on 9 ratings, followed by The Wolf of Wall Street with an average rating of 4.14 based on 7 ratings. Home Alone received an average rating of 4.00 from 7 ratings. Spider-Man had an average rating of 3.89 based on 9 ratings, while Harry Potter had the lowest average rating of 3.71 based on 7 ratings.
+
+The number of ratings varied across the movies because participants did not provide a rating for every movie. The analysis used the ratings that were actually provided. Missing ratings were not treated as zero because a missing rating does not indicate that a participant disliked the movie.
+
+## 8. Conclusion
+
+Overall, the analysis demonstrates how movie-rating data can be stored in a PostgreSQL database, retrieved and analyzed in R, and presented visually. The results show that the average ratings varied among the six movies. This project also demonstrates the use of SQL tables, relationships between tables, data joining, summary statistics, and data visualization.
+
+
